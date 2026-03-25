@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Reports</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+</head>
+<body class="bg-gray-100 flex justify-center items-start min-h-screen p-6">
+
+<div class="bg-white w-full max-w-3xl p-8 rounded-2xl shadow-lg">
+
+    <h1 class="text-2xl font-bold mb-6 text-gray-800">User Reports</h1>
+
+    <!-- User Type -->
+    <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-600 mb-1">User Type</label>
+        <select id="userType" onchange="loadUsers()"
+            class="w-full border border-gray-300 px-4 py-2 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+            <option value="">Select User Type</option>
+            <option value="PreChecker">Pre-Checker</option>
+            <option value="Sanctioning Officer">Reviewer</option>
+            <option value="Master Login">MoPR</option>
+        </select>
+    </div>
+
+    <!-- User Names -->
+    <div id="userDiv" class="hidden mb-6">
+        <label class="block text-sm font-medium text-gray-600 mb-1">User Name</label>
+        <select id="userNames" onchange="loadUserDetails()"
+            class="w-full border border-gray-300 px-4 py-2 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:outline-none transition">
+            <option value="">Select User</option>
+        </select>
+    </div>
+    
+<div class="flex justify-end mb-3">
+    <button id="exportBtn" onclick="exportTableToExcel()" disabled
+        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow opacity-50">
+        Export to Excel
+    </button>
+</div>
+
+    <!-- Table -->
+    <div id="userTableDiv" class="hidden">
+        <h2 class="text-lg font-semibold mb-3 text-gray-700">User Details</h2>
+
+        <div class="overflow-x-auto rounded-lg border">
+            <table class="min-w-full text-sm text-left text-gray-600">
+                <thead class="bg-gray-200 text-gray-700 uppercase text-xs">
+                    <tr>
+                        <th class="px-6 py-3">Name</th>
+                        <th class="px-6 py-3">Login ID</th>
+                        <th class="px-6 py-3">Assigned States</th>
+                    </tr>
+                </thead>
+
+                <tbody id="userTableBody" class="bg-white divide-y">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+
+  <script>
+function loadUsers() {
+    const type = document.getElementById("userType").value;
+    console.log("Selected type:", type); 
+
+    const userDiv = document.getElementById("userDiv");
+
+    if (!type) {
+        userDiv.classList.add("hidden");
+        return;
+    }
+
+    userDiv.classList.remove("hidden");
+
+    fetch("http://localhost:8080/users/by-type?type=" + type)
+        .then(res => res.json())
+        .then(data => {
+            console.log("API response:", data);
+
+            const dropdown = document.getElementById("userNames");
+            let optionsHtml = `<option value="">Select User</option>`;
+
+        // Only add "All Users" if there is more than 1 user in the list ✅
+        if (data.length > 1) {
+            optionsHtml += `<option value="ALL">All Users</option>`;
+        }
+
+        // Add the individual users
+        data.forEach(name => {
+            optionsHtml += `<option>${name}</option>`;
+        });
+
+        dropdown.innerHTML = optionsHtml;
+    })
+    .catch(err => console.error("Error:", err));
+}
+
+
+
+function loadUserDetails() {
+    const name = document.getElementById("userNames").value;
+
+    if (!name) return;
+
+    let url = "";
+
+    if (name === "ALL") {
+        url = "http://localhost:8080/users/all-details";
+    } else {
+        url = "http://localhost:8080/users/user-details?name=" + name;
+    }
+
+    fetch(url)
+        .then(res => res.json())
+        .then(data => {
+            const tableDiv = document.getElementById("userTableDiv");
+            const tableBody = document.getElementById("userTableBody");
+
+            tableBody.innerHTML = "";
+
+            data.forEach(row => {
+                tableBody.innerHTML += `
+                    <tr class="hover:bg-gray-100">
+                        <td class="px-6 py-3 font-medium">${row[0]}</td>
+                        <td class="px-6 py-3">${row[1]}</td>
+                        <td class="px-6 py-3">${row[2]}</td>
+                    </tr>
+                `;
+            });
+
+            tableDiv.classList.remove("hidden");
+            
+            document.getElementById("exportBtn").disabled = false;
+document.getElementById("exportBtn").classList.remove("opacity-50");
+            
+        });
+}
+
+function exportTableToExcel() {
+    const table = document.querySelector("#userTableDiv table");
+
+    if (!table) {
+        alert("No data available!");
+        return;
+    }
+
+    const wb = XLSX.utils.table_to_book(table, { sheet: "Users" });
+    
+    let userName = document.getElementById("userNames").value;
+
+if (!userName) {
+    userName = "user_report";
+} else if (userName === "ALL") {
+    userName = "all_users";
+}
+
+XLSX.writeFile(wb, userName + ".xlsx");
+   
+}
+
+
+
+</script>
+
+</body>
+</html>
