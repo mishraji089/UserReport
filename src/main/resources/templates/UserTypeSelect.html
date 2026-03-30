@@ -14,7 +14,7 @@
 
     <!-- User Type -->
     <div class="mb-6">
-        <label class="block text-sm font-medium text-gray-600 mb-1">User Type</label>
+        <label class="block text-sm font-medium text-gray-600 mb-1">Select Type</label>
         <select id="userType" onchange="loadUsers()"
             class="w-full border border-gray-300 px-4 py-2 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
             <option value="">Select User Type</option>
@@ -26,7 +26,7 @@
 
     <!-- User Names -->
     <div id="userDiv" class="hidden mb-6">
-        <label class="block text-sm font-medium text-gray-600 mb-1">User Name</label>
+        <label class="block text-sm font-medium text-gray-600 mb-1">Select Name</label>
         <select id="userNames" onchange="loadUserDetails()"
             class="w-full border border-gray-300 px-4 py-2 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:outline-none transition">
             <option value="">Select User</option>
@@ -41,6 +41,15 @@
 </div>
 
     <!-- Table -->
+    <div class="mb-4">
+    <input 
+        type="text" 
+        id="searchInput"
+        onkeyup="filterTable()"
+        placeholder="Search by Login ID..."
+        class="w-full border border-gray-300 px-4 py-2 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+    >
+</div>
     <div id="userTableDiv" class="hidden">
         <h2 class="text-lg font-semibold mb-3 text-gray-700">User Details</h2>
 
@@ -140,6 +149,20 @@ function loadUserDetails() {
 document.getElementById("exportBtn").classList.remove("opacity-50");
             
         });
+}
+function filterTable() {
+    const input = document.getElementById("searchInput").value.toLowerCase();
+    const rows = document.querySelectorAll("#userTableBody tr");
+
+    rows.forEach(row => {
+        const loginId = row.children[1].textContent.toLowerCase(); // 2nd column
+
+        if (loginId.includes(input)) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
+    });
 }
 
 function exportTableToExcel() {
