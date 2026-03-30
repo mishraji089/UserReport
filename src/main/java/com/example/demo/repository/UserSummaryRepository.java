@@ -20,9 +20,11 @@ public interface UserSummaryRepository extends JpaRepository<UserSummary, Intege
     List<Object[]> getUserDetails(@Param("name") String name,
                                  @Param("type") String type);
     	
-    @Query(value = "SELECT user_name, user_login_id, user_type, assigned_states " +
-            "FROM rgsa.user_master_summary " +   // ✅ space added
-            "ORDER BY user_name",
-            nativeQuery = true)
-    List<Object[]> getAllUserDetails();
+    @Query(value = """
+            SELECT user_name, user_login_id, user_type, assigned_states
+            FROM rgsa.user_master_summary
+            WHERE user_type = :type
+            ORDER BY user_name
+            """, nativeQuery = true)
+    List<Object[]> getAllUserDetailsByType(@Param("type") String type);
 }
