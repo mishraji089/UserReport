@@ -114,7 +114,9 @@ function loadUsers() {
 
 function loadUserDetails() {
     const name = document.getElementById("userNames").value;
-
+    const type=document.getElementById("userType").value;
+    
+    
     if (!name) return;
 
     let url = "";
@@ -122,7 +124,7 @@ function loadUserDetails() {
     if (name === "ALL") {
         url = "http://localhost:8080/users/all-details";
     } else {
-        url = "http://localhost:8080/users/user-details?name=" + name;
+        url = "http://localhost:8080/users/user-details?name=" + name + "&type=" + type;
     }
 
     fetch(url)
@@ -138,7 +140,7 @@ function loadUserDetails() {
                     <tr class="hover:bg-gray-100">
                         <td class="px-6 py-3 font-medium">${row[0]}</td>
                         <td class="px-6 py-3">${row[1]}</td>
-                        <td class="px-6 py-3">${row[2]}</td>
+                        <td class="px-6 py-3">${row[3]}</td>
                     </tr>
                 `;
             });

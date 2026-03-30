@@ -19,8 +19,12 @@ public class UserController {
         return userSummaryRepository.findNamesByType(type);
     }
     @GetMapping("/user-details")
-    public List<Object[]> getUserDetails(@RequestParam("name") String name) {
-        return userSummaryRepository.getUserDetails(name);
+    @ResponseBody
+    public List<Object[]> getUserDetails(
+            @RequestParam("name") String name,
+            @RequestParam("type") String type) {
+
+        return userSummaryRepository.getUserDetails(name, type);
     }
     
     @GetMapping("/all-details")
