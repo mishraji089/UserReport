@@ -65,11 +65,10 @@
 
 
   <script>
-function loadUsers() {
+async function loadUsers() {
     const type = document.getElementById("userType").value;
-    console.log("Selected type:", type); 
-
     const userDiv = document.getElementById("userDiv");
+    const dropdown = document.getElementById("userNames");
 
     if (!type) {
         userDiv.classList.add("hidden");
@@ -78,28 +77,39 @@ function loadUsers() {
 
     userDiv.classList.remove("hidden");
 
-    fetch("http://localhost:8080/users/by-type?type=" + type)
-        .then(res => res.json())
-        .then(data => {
-            console.log("API response:", data);
+    // 🔥 Show loading state
+    dropdown.innerHTML = `<option>Loading...</option>`;
 
-            const dropdown = document.getElementById("userNames");
-            let optionsHtml = `<option value="">Select User</option>`;
+    try {
+        const res = await fetch(`http://localhost:8080/users/by-type?type=${type}`);
+        const data = await res.json();
 
-        // Only add "All Users" if there is more than 1 user in the list ✅
-        if (data.length > 1) {
-            optionsHtml += `<option value="ALL">All Users</option>`;
+        if (!data || data.length === 0) {
+            dropdown.innerHTML = `<option>No users found</option>`;
+            return;
         }
 
-        // Add the individual users
-        data.forEach(name => {
-            optionsHtml += `<option>${name}</option>`;
-        });
+        // 🔥 Build options efficiently
+        let options = `<option value="">Select User</option>`;
 
-        dropdown.innerHTML = optionsHtml;
-    })
-    .catch(err => console.error("Error:", err));
+        if (data.length > 1) {
+            options += `<option value="ALL">All Users</option>`;
+        }
+
+        options += data.map(name => 
+            `<option value="${name}">${name}</option>`
+        ).join("");
+
+        dropdown.innerHTML = options;
+
+    } catch (err) {
+        console.error("Error:", err);
+        dropdown.innerHTML = `<option>Error loading users</option>`;
+    }
 }
+
+
+
 
 
 
@@ -113,12 +123,12 @@ async function loadUserDetails() {
     const tableBody = document.getElementById("userTableBody");
     const exportBtn = document.getElementById("exportBtn");
 
-    // 🔥 Build URL (clean way)
+  
     const url = name === "ALL"
         ? `http://localhost:8080/users/all-users?type=${type}`
         : `http://localhost:8080/users/user-details?name=${name}&type=${type}`;
 
-    // 🔥 Show loader
+   
     tableDiv.classList.remove("hidden");
     tableBody.innerHTML = `
         <tr>
