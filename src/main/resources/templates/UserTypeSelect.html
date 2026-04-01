@@ -103,45 +103,78 @@ function loadUsers() {
 
 
 
-function loadUserDetails() {
+async function loadUserDetails() {
     const name = document.getElementById("userNames").value;
-    const type=document.getElementById("userType").value;
-    
-    
+    const type = document.getElementById("userType").value;
+
     if (!name) return;
 
-    let url = "";
+    const tableDiv = document.getElementById("userTableDiv");
+    const tableBody = document.getElementById("userTableBody");
+    const exportBtn = document.getElementById("exportBtn");
 
-    if (name === "ALL") {
-        url = "http://localhost:8080/users/all-users?type=" + type;
-    } else {
-        url = "http://localhost:8080/users/user-details?name=" + name + "&type=" + type;
+    // 🔥 Build URL (clean way)
+    const url = name === "ALL"
+        ? `http://localhost:8080/users/all-users?type=${type}`
+        : `http://localhost:8080/users/user-details?name=${name}&type=${type}`;
+
+    // 🔥 Show loader
+    tableDiv.classList.remove("hidden");
+    tableBody.innerHTML = `
+        <tr>
+            <td colspan="3" class="text-center py-4">
+                <div class="flex justify-center items-center gap-2">
+                    <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+                    <span>Loading...</span>
+                </div>
+            </td>
+        </tr>
+    `;
+
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+       
+        if (!data || data.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="3" class="text-center py-4 text-gray-500">
+                        No data found
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        // 🔥 Build rows (faster than innerHTML += in loop)
+        const rows = data.map(row => {
+            const states = row[3] || "";
+            return `
+                <tr class="hover:bg-gray-100">
+                    <td class="px-6 py-3 font-medium">${row[0]}</td>
+                    <td class="px-6 py-3">${row[1]}</td>
+                    <td class="px-6 py-3">${states}</td>
+                </tr>
+            `;
+        }).join("");
+
+        tableBody.innerHTML = rows;
+
+        // 🔥 Enable export
+        exportBtn.disabled = false;
+        exportBtn.classList.remove("opacity-50");
+
+    } catch (err) {
+        console.error(err);
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="3" class="text-center py-4 text-red-500">
+                    Error loading data
+                </td>
+            </tr>
+        `;
     }
-
-    fetch(url)
-        .then(res => res.json())
-        .then(data => {
-            const tableDiv = document.getElementById("userTableDiv");
-            const tableBody = document.getElementById("userTableBody");
-
-            tableBody.innerHTML = "";
-
-            data.forEach(row => {
-                tableBody.innerHTML += `
-                    <tr class="hover:bg-gray-100">
-                        <td class="px-6 py-3 font-medium">${row[0]}</td>
-                        <td class="px-6 py-3">${row[1]}</td>
-                        <td class="px-6 py-3">${row[3]}</td>
-                    </tr>
-                `;
-            });
-
-            tableDiv.classList.remove("hidden");
-            
-            document.getElementById("exportBtn").disabled = false;
-document.getElementById("exportBtn").classList.remove("opacity-50");
-            
-        });
 }
 function exportTableToExcel() {
     const table = document.querySelector("#userTableDiv table");

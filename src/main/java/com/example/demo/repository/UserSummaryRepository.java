@@ -13,10 +13,11 @@ public interface UserSummaryRepository extends JpaRepository<UserSummary, Intege
     List<String> findNamesByType(@Param("type") String type);
     
     
-    @Query(value = "SELECT user_name, user_login_id, user_type, assigned_states " +
-            "FROM rgsa.user_master_summary " +
-            "WHERE user_name = :name AND user_type = :type",
-            nativeQuery = true)
+    @Query(value ="""
+    		SELECT user_name, user_login_id, user_type, assigned_states
+            FROM rgsa.user_master_summary 
+            WHERE user_name = :name AND user_type = :type
+            """, nativeQuery = true)
     List<Object[]> getUserDetails(@Param("name") String name,
                                  @Param("type") String type);
     	
