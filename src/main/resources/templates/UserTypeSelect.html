@@ -157,7 +157,7 @@ async function loadUserDetails() {
             return;
         }
 
-        // 🔥 Build rows (faster than innerHTML += in loop)
+        
         const rows = data.map(row => {
             const states = row[3] || "";
             return `
@@ -171,7 +171,7 @@ async function loadUserDetails() {
 
         tableBody.innerHTML = rows;
 
-        // 🔥 Enable export
+       
         exportBtn.disabled = false;
         exportBtn.classList.remove("opacity-50");
 

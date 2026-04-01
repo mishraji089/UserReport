@@ -10,37 +10,49 @@
 <body class="bg-gray-100 flex">
 
     <!-- Left Sidebar -->
-    <div class="w-64 bg-blue-600 min-h-screen p-4 text-white">
+    <!-- Left Sidebar -->
+<div class="w-64 bg-gradient-to-b from-blue-700 to-blue-500 min-h-screen p-4 text-white shadow-lg">
 
-        <!-- Dropdown Button -->
-        <button onclick="toggleDropdown()" class="w-full bg-blue-800 px-4 py-2 rounded text-left">
-            User Management ▼
-        </button>
+    <!-- Title -->
+    <h1 class="text-xl font-bold mb-6 tracking-wide">Dashboard</h1>
 
-        <!-- Dropdown Menu -->
-        <div id="dropdownMenu" class="hidden mt-2 bg-white text-black rounded shadow">
-            <a href="/UserTypeSelect" class="block px-4 py-2 hover:bg-gray-200">
-    User Reports
-			</a>
-        </div>
+    <!-- Dropdown Button -->
+    <button onclick="toggleDropdown()" 
+        class="w-full flex justify-between items-center bg-blue-800 px-4 py-3 rounded-lg hover:bg-blue-900 transition duration-300 shadow">
+
+        <span class="flex items-center gap-2">
+             <span>User Management</span>
+        </span>
+        <span id="arrow" class="transition-transform duration-300">▼</span>
+    </button>
+
+    <!-- Dropdown Menu -->
+    <div id="dropdownMenu" 
+        class="hidden mt-3 bg-white text-gray-800 rounded-lg shadow-lg overflow-hidden transition-all duration-300">
+
+        <a href="/UserTypeSelect" 
+           class="flex items-center gap-2 px-4 py-3 hover:bg-blue-100 transition">
+             User Reports
+        </a>
+
 
     </div>
-
-    <!-- Main Content -->
-    <div class="flex-1 p-6">
-
-        <!-- User Reports Section -->
-        <div id="reports" class="hidden">
-            <h2 class="text-2xl font-semibold">User Reports</h2>
-        </div>
-
-    </div>
+</div>
 
     <!-- Script -->
     <script>
         function toggleDropdown() {
             document.getElementById("dropdownMenu").classList.toggle("hidden");
         }
+        function toggleDropdown() {
+    const menu = document.getElementById("dropdownMenu");
+    const arrow = document.getElementById("arrow");
+
+    menu.classList.toggle("hidden");
+
+    // Rotate arrow
+    arrow.classList.toggle("rotate-180");
+}
 
         
     </script>

@@ -13,7 +13,7 @@ public class UserController {
     @Autowired
     private UserSummaryRepository userSummaryRepository;
 
-    // API: /users/by-type?type=Pre-Checker
+   
     @GetMapping("/by-type")
     public List<String> getUsersByType(@RequestParam("type") String type) {
         return userSummaryRepository.findNamesByType(type);
