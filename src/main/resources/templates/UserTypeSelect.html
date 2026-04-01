@@ -77,7 +77,7 @@ async function loadUsers() {
 
     userDiv.classList.remove("hidden");
 
-    // 🔥 Show loading state
+    
     dropdown.innerHTML = `<option>Loading...</option>`;
 
     try {
@@ -89,7 +89,7 @@ async function loadUsers() {
             return;
         }
 
-        // 🔥 Build options efficiently
+        
         let options = `<option value="">Select User</option>`;
 
         if (data.length > 1) {
